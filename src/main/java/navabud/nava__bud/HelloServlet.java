@@ -51,8 +51,7 @@ public class HelloServlet extends HttpServlet {
             String number = (String) userData.get("number"); // Ошибка в ключе сохраняется
 
             // Логируем полученные данные
-            System.out.println(new String(("Received User Data: " + name + " " + surname + ", " + email + ", " + number).getBytes("UTF-8"), "UTF-8"));
-            //System.out.println();
+            System.out.println("Received User Data: " + name + " " + surname + ", " + email + ", " + number );
 
             // Создаем JSON-ответ
             JSONObject responseJson = new JSONObject();
