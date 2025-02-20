@@ -1,3 +1,5 @@
+package Main;
+
 import Essence.Person;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,15 +18,17 @@ public class Main {
     public class sqlUsing  {
 
         public static void SqlAdd (Person pers) throws  Exception{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
             Connection connection  = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/Test",
                     "root", "ServBay.dev");
             Statement statement = connection.createStatement();
 
             int results = statement.executeUpdate(
-                    "INSERT INTO `testTable` (`id`, `name`, `surnem`, `mail`, `numb`) " +
-                            "VALUES (NULL, '"+ pers.getName() +"', '"+ pers.getSurnem() +"', '"+ pers.getMail() +"', '"+ pers.getNumb()+"')");
-
+                    "INSERT INTO `testTable` (`id`, `data_add`, `name`, `surname`, `mail`, `number`) " +
+                            "VALUES (NULL,'"+pers.getDate()+"', '"+ pers.getName() +"', '"+ pers.getSurnem() +"', '"+ pers.getMail() +"', '"+ pers.getNumb()+"')");
+           // "INSERT INTO `testTable` (`id`, `data_add`, `name`, `surname`, `mail`, `number`) VALUES (NULL, '', '', '', '', '')"
             connection.close();
         }
 
@@ -36,21 +40,6 @@ public class Main {
             Reader reader = new FileReader("src/test.json");
 
             JSONObject jsonObject = (JSONObject) parser.parse(reader);
-
-            JSONObject jsonObject1 = (JSONObject) jsonObject.get("address");
-
-
-            String name = (String) jsonObject1.get("name");
-            String surname = (String) jsonObject1.get("surname");
-            String email = (String) jsonObject1.get("email");
-            Integer numbr = (Integer) jsonObject1.get("numbr");
-
-
-            System.out.println("Key: " + jsonObject.keySet());
-
-            Person per = new Person(name,surname,email,numbr);
-            sqlUsing.SqlAdd(per);
-            System.out.println("success");
 
         }
     }
