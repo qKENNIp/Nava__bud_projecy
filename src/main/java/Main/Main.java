@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import static Essence.GLOBALTOKENS.*;
 
 public class Main {
 
@@ -21,14 +22,12 @@ public class Main {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             Connection connection  = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/Test",
-                    "root", "ServBay.dev");
+                    ConnectionTOSQL,User,Password);
             Statement statement = connection.createStatement();
 
             int results = statement.executeUpdate(
                     "INSERT INTO `testTable` (`id`, `data_add`, `name`, `surname`, `mail`, `number`) " +
                             "VALUES (NULL,'"+pers.getDate()+"', '"+ pers.getName() +"', '"+ pers.getSurnem() +"', '"+ pers.getMail() +"', '"+ pers.getNumb()+"')");
-           // "INSERT INTO `testTable` (`id`, `data_add`, `name`, `surname`, `mail`, `number`) VALUES (NULL, '', '', '', '', '')"
             connection.close();
         }
 

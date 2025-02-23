@@ -41,7 +41,6 @@ public class HelloServlet extends HttpServlet {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         // Извлечение данных из JSON
         String name = (String) jsonRequest.get("name");
         String surname = (String) jsonRequest.get("surname");
