@@ -1,19 +1,46 @@
 package navabud.nava__bud;
-import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import java.io.*;
-import java.net.*;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
+import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
+import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.generics.TelegramClient;
+
 import static Essence.GLOBALTOKENS.BOT_TOKEN;
 
 @WebServlet("/telegram-bot")
-public class TelegramBotServlet extends HttpServlet {
+public class TelegramBot extends HttpServlet implements LongPollingSingleThreadUpdateConsumer {
 
+    private TelegramClient telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
 
+    public TelegramBot(String botToken) {
+        telegramClient = new OkHttpTelegramClient(botToken);
+    }
 
+    @Override
+    public void consume(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+        // Create your send messengeText object
+            String messengeText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+            SendMessage sendMessage =  SendMessage
+                    .builder()
+                    .chatId(chatId)
+                    .text(messengeText)
+                    .build();
+            try {
+                // Execute it
+                telegramClient.execute(sendMessage);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /*
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Чтение JSON-данных, полученных от Telegram (данные о нажатой кнопке)
@@ -23,6 +50,7 @@ public class TelegramBotServlet extends HttpServlet {
         while ((line = reader.readLine()) != null) {
             sb.append(line);
         }
+
 
         // Парсим полученные данные
         JSONParser parser = new JSONParser();
@@ -120,5 +148,5 @@ public class TelegramBotServlet extends HttpServlet {
         }
 
         connection.getResponseCode();  // Отправка запроса
-    }
+    }*/
 }
