@@ -2,22 +2,22 @@ package navabud.nava__bud;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-
 import Essence.Person;
 import Main.Main;
+
+import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static Essence.GLOBALTOKENS.BOT_TOKEN;
 
@@ -42,19 +42,24 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                 try {
                     long chatId = update.getMessage().getChatId();
 
-                    InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
-                    List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-                    SendMessage message;
-                    String buttonValue ="buton";
+                    // Создаем сообщение
+                    SendMessage message = new SendMessage(String.valueOf(chatId),"Нажмите кнопку:");
 
-                    InlineKeyboardButton button = new InlineKeyboardButton();
-                    button.setText("button");
-                    button.setCallbackData(buttonValue);
+                    // Создаем кнопку
+                    InlineKeyboardButton button = new InlineKeyboardButton("Нажми меня");
+                    button.setCallbackData("button_callback");
 
-                    keyboard.add(List.of(button));
+                    // Создаем строку клавиатуры и добавляем кнопку
+                    InlineKeyboardRow row = new InlineKeyboardRow();
+                    row.add(button);
 
-                    markup.setKeyboard(keyboard);
-                    message.setReplyMarkup(markup) = new SendMessage();
+                    // Создаем разметку клавиатуры и добавляем строку
+                    InlineKeyboardMarkup markup = new InlineKeyboardMarkup(Collections.singletonList(row));
+
+                    // Устанавливаем клавиатуру в сообщение
+                    message.setReplyMarkup(markup);
+
+                    telegramClient.execute(message);
 
 
                     ArrayList <Person> list = new ArrayList<Person>();
