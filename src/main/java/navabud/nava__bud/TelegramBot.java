@@ -54,7 +54,7 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                     keyboard.add(List.of(button));
 
                     markup.setKeyboard(keyboard);
-                    message.setReplyMarkup(markup) = new SendMessage()
+                    message.setReplyMarkup(markup) = new SendMessage();
 
 
                     ArrayList <Person> list = new ArrayList<Person>();
