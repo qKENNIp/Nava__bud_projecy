@@ -7,25 +7,26 @@ import org.json.simple.parser.JSONParser;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import java.io.FileReader;
 import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static Essence.GLOBALTOKENS.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         try {
             TelegramBotsLongPollingApplication botsApplication = new TelegramBotsLongPollingApplication();
 
             botsApplication.registerBot(BOT_TOKEN, new TelegramBot(BOT_TOKEN));
-
-            System.out.println("MyAmazingBot successfully started!");
-            Thread.currentThread().join();
+//            Thread.currentThread().join();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        //System.out.println(sqlUsing.SqlWithOutAnswer(new ArrayList<Person>()).get(0));
     }
 
     public class sqlUsing  {
@@ -69,6 +70,39 @@ public class Main {
                 e.printStackTrace();
             } finally {
                 connection.close();
+            }
+        }
+
+        public static ArrayList<Person> SqlWithOutAnswer (ArrayList<Person> userList) throws  Exception {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Connection connection = null;
+
+            try {
+                connection = DriverManager.getConnection(
+                        CONNECTION_TOSQL, SQ_LLOGIN, PASSWORD);
+                Statement statement = connection.createStatement();
+
+                ResultSet results = statement.executeQuery(
+                        "SELECT * FROM `testTable` WHERE `answer` = 0"
+                );
+                System.out.println("id" + "\t name" + "\t surname" + "\t mail" + "\t\t\t\t number");
+                while (results.next()) {
+                    Integer id = results.getInt(1);
+                    String name = results.getString(3);
+                    String surname = results.getString(4);
+                    String mail = results.getString(5);
+                    String number = results.getString(6);
+
+                    userList.add(new Person(id,name,surname,mail,number));
+                    System.out.println(id + "\t "+ name + "\t "+ surname + "\t "+ mail + "\t "+ number);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                connection.close();
+                return userList;
             }
         }
 
