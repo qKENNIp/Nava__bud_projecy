@@ -51,6 +51,7 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                         // Отправка ответа на callback-запрос
                         telegramClient.execute(answerCallbackQuery);
                         buttons.remove(key);
+                        System.out.println("AnswerCallbackQuery: " + answerCallbackQuery.getText());
                     }
                 }
 
@@ -77,7 +78,7 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                         // Создаем разметку клавиатуры и добавляем строку
                         InlineKeyboardMarkup markup = new InlineKeyboardMarkup(Collections.singletonList(row));
 
-                        String messageText = "" + person.getId() + " " + person.getName() + " " + person.getSurnem() +
+                        String messageText =  person.getName() + " " + person.getSurnem() +
                                 "\n   " + person.getMail() + "\n   " + person.getNumb();
 
                         SendMessage sendMessage = SendMessage.builder()
@@ -89,7 +90,6 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                     }
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

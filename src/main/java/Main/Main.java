@@ -87,7 +87,7 @@ public class Main {
                 ResultSet results = statement.executeQuery(
                         "SELECT * FROM `testTable` WHERE `answer` = 0"
                 );
-                System.out.println("id" + "\t name" + "\t surname" + "\t mail" + "\t\t\t\t number");
+                //System.out.println("id" + "\t name" + "\t surname" + "\t mail" + "\t\t\t\t number");
                 while (results.next()) {
                     Integer id = results.getInt(1);
                     String name = results.getString(3);
@@ -96,7 +96,7 @@ public class Main {
                     String number = results.getString(6);
 
                     userList.add(new Person(id,name,surname,mail,number));
-                    System.out.println(id + "\t "+ name + "\t "+ surname + "\t "+ mail + "\t "+ number);
+                    //System.out.println(id + "\t "+ name + "\t "+ surname + "\t "+ mail + "\t "+ number);
                 }
 
             } catch (Exception e) {
