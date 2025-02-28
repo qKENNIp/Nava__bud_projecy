@@ -53,7 +53,7 @@ public class Main {
             }
 
         }
-        public static void SqlUpdate (String id) throws  Exception {
+        public static void SqlUpdate (int id) throws  Exception {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             Connection connection = null;
@@ -64,7 +64,7 @@ public class Main {
                 Statement statement = connection.createStatement();
 
                 int results = statement.executeUpdate(
-                        "UPDATE `testTable` SET `id`='"+id+"',`answer`='1' WHERE 1"
+                        "UPDATE `testTable` SET `answer` = '1' WHERE `testTable`.`id` = "+id
                 );
 
             } catch (Exception e) {
@@ -89,7 +89,7 @@ public class Main {
                 );
                 System.out.println("id" + "\t name" + "\t surname" + "\t mail" + "\t\t\t\t number");
                 while (results.next()) {
-                    String id = results.getString(1);
+                    Integer id = results.getInt(1);
                     String name = results.getString(3);
                     String surname = results.getString(4);
                     String mail = results.getString(5);

@@ -5,17 +5,16 @@ import javax.servlet.http.*;
 import Essence.Person;
 import Main.Main;
 
-import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.*;
@@ -26,6 +25,7 @@ import static Essence.GLOBALTOKENS.BOT_TOKEN;
 public class TelegramBot extends HttpServlet implements LongPollingSingleThreadUpdateConsumer {
 
     private TelegramClient telegramClient = new OkHttpTelegramClient(BOT_TOKEN);
+    private HashMap<String, Integer> buttons = new HashMap <String, Integer>();
 
     public TelegramBot(String botToken) {
         telegramClient = new OkHttpTelegramClient(botToken);
@@ -33,53 +33,67 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
 
     @Override
     public void consume(Update update) {
+        try {
+            // Обработка callback-запроса
+            if (update.hasCallbackQuery()) {
+                CallbackQuery callbackQuery = update.getCallbackQuery();
+                String callbackData = callbackQuery.getData();
+                for (String key : buttons.keySet()) {
+                    if (key.equals(callbackData)) {
+                        // Выполнение действия при нажатии кнопки
 
-        if (update.getMessage().getChatId().equals(BOT_TOKEN)) {
+                        Main.sqlUsing.SqlUpdate(buttons.get(key));  // Ваш метод для обработки
 
-        }
-        if (update.hasMessage() && update.getMessage().hasText()) {
-        // Create your send messengeText object
-            if (update.getMessage().getText().equals("/start")) {
-                try {
+                        // Создание объекта AnswerCallbackQuery с помощью сеттеров
+                        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery(callbackQuery.getId());
+                        answerCallbackQuery.setText("Действие выполнено!");
+
+                        // Отправка ответа на callback-запрос
+                        telegramClient.execute(answerCallbackQuery);
+                        buttons.remove(key);
+                    }
+                }
+
+            }
+
+            // Обработка текстовых сообщений
+            if (update.hasMessage() && update.getMessage().hasText()) {
+                if ("/start".equals(update.getMessage().getText())) {
                     long chatId = update.getMessage().getChatId();
 
-                    // Создаем кнопку
-                    InlineKeyboardButton button = new InlineKeyboardButton("Ответил");
-                    button.setCallbackData("button_click");
-
-                    CallbackQuery callbackQuery = update.getCallbackQuery();
-                    String callbackData = callbackQuery.getData();
-                    // Создаем строку клавиатуры и добавляем кнопку
-                    InlineKeyboardRow row = new InlineKeyboardRow();
-                    row.add(button);
-
-                    // Создаем разметку клавиатуры и добавляем строку
-                    InlineKeyboardMarkup markup = new InlineKeyboardMarkup(Collections.singletonList(row));
-
-                    ArrayList <Person> list = new ArrayList<Person>();
+                    ArrayList<Person> list = new ArrayList<>();
                     Main.sqlUsing.SqlWithOutAnswer(list);
 
+                    // Отправляем сообщения пользователям
                     for (Person person : list) {
-                        String messengeText =
-                                ""+person.getId()+" "+person.getName()+" "+person.getSurnem()+
-                                        "\n   "+person.getMail()+"\n   "+ person.getNumb();
+                        // Создаем кнопку
+                        InlineKeyboardButton button = new InlineKeyboardButton("Ответил");
+                        button.setCallbackData("button_click_"+person.getId());
+                        buttons.put("button_click_"+person.getId(),person.getId());
+                        // Создаем строку клавиатуры и добавляем кнопку
+                        InlineKeyboardRow row = new InlineKeyboardRow();
+                        row.add(button);
 
-                        SendMessage sendMessage = SendMessage
-                                .builder()
+                        // Создаем разметку клавиатуры и добавляем строку
+                        InlineKeyboardMarkup markup = new InlineKeyboardMarkup(Collections.singletonList(row));
+
+                        String messageText = "" + person.getId() + " " + person.getName() + " " + person.getSurnem() +
+                                "\n   " + person.getMail() + "\n   " + person.getNumb();
+
+                        SendMessage sendMessage = SendMessage.builder()
                                 .chatId(chatId)
-                                .text(messengeText)
+                                .text(messageText)
                                 .build();
                         sendMessage.setReplyMarkup(markup);
-                        // Execute it
                         telegramClient.execute(sendMessage);
-                        if ("button_click".equals(callbackData)) {
-                            Main.sqlUsing.SqlUpdate(person.getId());
-                        }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+
 }
