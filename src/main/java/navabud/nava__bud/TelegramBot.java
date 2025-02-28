@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -42,25 +43,18 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                 try {
                     long chatId = update.getMessage().getChatId();
 
-                    // Создаем сообщение
-                    SendMessage message = new SendMessage(String.valueOf(chatId),"Нажмите кнопку:");
-
                     // Создаем кнопку
-                    InlineKeyboardButton button = new InlineKeyboardButton("Нажми меня");
-                    button.setCallbackData("button_callback");
+                    InlineKeyboardButton button = new InlineKeyboardButton("Ответил");
+                    button.setCallbackData("button_click");
 
+                    CallbackQuery callbackQuery = update.getCallbackQuery();
+                    String callbackData = callbackQuery.getData();
                     // Создаем строку клавиатуры и добавляем кнопку
                     InlineKeyboardRow row = new InlineKeyboardRow();
                     row.add(button);
 
                     // Создаем разметку клавиатуры и добавляем строку
                     InlineKeyboardMarkup markup = new InlineKeyboardMarkup(Collections.singletonList(row));
-
-                    // Устанавливаем клавиатуру в сообщение
-                    message.setReplyMarkup(markup);
-
-                    telegramClient.execute(message);
-
 
                     ArrayList <Person> list = new ArrayList<Person>();
                     Main.sqlUsing.SqlWithOutAnswer(list);
@@ -70,22 +64,22 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                                 ""+person.getId()+" "+person.getName()+" "+person.getSurnem()+
                                         "\n   "+person.getMail()+"\n   "+ person.getNumb();
 
-                        SendMessage sendMessage =  SendMessage
+                        SendMessage sendMessage = SendMessage
                                 .builder()
                                 .chatId(chatId)
                                 .text(messengeText)
                                 .build();
-
+                        sendMessage.setReplyMarkup(markup);
                         // Execute it
                         telegramClient.execute(sendMessage);
-
+                        if ("button_click".equals(callbackData)) {
+                            Main.sqlUsing.SqlUpdate(person.getId());
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-
         }
-
     }
 }

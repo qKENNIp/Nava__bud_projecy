@@ -6,7 +6,7 @@ import java.util.Date;
 public class Person {
 
     private Date date = new Date();
-    private int id = 0;
+    private String id = "0";
     private String name = null;
     private String surnem = null;
     private String mail = null;
@@ -19,7 +19,7 @@ public class Person {
         this.numb = numb;
     }
 
-    public Person(int id , String name, String surnem,String mail, String numb) {
+    public Person(String id , String name, String surnem,String mail, String numb) {
         this.id = id;
         this.name = name;
         this.surnem = surnem;
@@ -33,8 +33,8 @@ public class Person {
         SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
         return formatter.format(date);
     }
-    public void setId(int id) {this.id = id;}
-    public int getId() {return this.id;}
+    public void setId(String id) {this.id = id;}
+    public String getId() {return this.id;}
 
     public void setName(String name){
         this.name = name;

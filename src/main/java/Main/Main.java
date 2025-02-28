@@ -31,7 +31,7 @@ public class Main {
 
     public class sqlUsing  {
 
-        public static void SqlAdd (Person pers) throws  Exception{
+        public static String SqlAdd (Person pers) throws  Exception{
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             Connection connection = null;
@@ -49,6 +49,7 @@ public class Main {
                 e.printStackTrace();
             }finally {
                 connection.close();
+                return "ok";
             }
 
         }
@@ -88,7 +89,7 @@ public class Main {
                 );
                 System.out.println("id" + "\t name" + "\t surname" + "\t mail" + "\t\t\t\t number");
                 while (results.next()) {
-                    Integer id = results.getInt(1);
+                    String id = results.getString(1);
                     String name = results.getString(3);
                     String surname = results.getString(4);
                     String mail = results.getString(5);
