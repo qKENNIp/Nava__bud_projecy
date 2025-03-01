@@ -3,7 +3,7 @@ package navabud.nava__bud;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import Essence.Person;
-import Main.Main;
+import Main.sqlUsing;
 
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.*;
 
+import static Essence.GLOBALTOKENS.ADMINUSER;
 import static Essence.GLOBALTOKENS.BOT_TOKEN;
 
 @WebServlet("/telegram-bot")
@@ -34,21 +35,21 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
     @Override
     public void consume(Update update) {
         try {
-            // Обработка callback-запроса
+            // Callback request processing
             if (update.hasCallbackQuery()) {
                 CallbackQuery callbackQuery = update.getCallbackQuery();
                 String callbackData = callbackQuery.getData();
                 for (String key : buttons.keySet()) {
                     if (key.equals(callbackData)) {
-                        // Выполнение действия при нажатии кнопки
+                        // Performing an action when the button is pressed
 
-                        Main.sqlUsing.SqlUpdate(buttons.get(key));  // Ваш метод для обработки
+                        Main.sqlUsing.SqlUpdate(buttons.get(key));
 
-                        // Создание объекта AnswerCallbackQuery с помощью сеттеров
+                        // Creating an AnswerCallbackQuery object using setters
                         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery(callbackQuery.getId());
                         answerCallbackQuery.setText("Действие выполнено!");
 
-                        // Отправка ответа на callback-запрос
+                        // Send response to callback request
                         telegramClient.execute(answerCallbackQuery);
                         buttons.remove(key);
                         System.out.println("AnswerCallbackQuery: " + answerCallbackQuery.getText());
@@ -57,36 +58,39 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
 
             }
 
-            // Обработка текстовых сообщений
+            // Text message processing
             if (update.hasMessage() && update.getMessage().hasText()) {
-                if ("/start".equals(update.getMessage().getText())) {
+                if ("/start".equals(update.getMessage().getText()) && (update.getMessage().getChatId() == ADMINUSER)) {
                     long chatId = update.getMessage().getChatId();
 
                     ArrayList<Person> list = new ArrayList<>();
-                    Main.sqlUsing.SqlWithOutAnswer(list);
+                    sqlUsing.SqlWithOutAnswer(list);
 
-                    // Отправляем сообщения пользователям
+                    // Sending messages to users
                     for (Person person : list) {
-                        // Создаем кнопку
+                        // Create a button
                         InlineKeyboardButton button = new InlineKeyboardButton("Ответил");
                         button.setCallbackData("button_click_"+person.getId());
                         buttons.put("button_click_"+person.getId(),person.getId());
-                        // Создаем строку клавиатуры и добавляем кнопку
+                        // Create a keyboard row and add a button
                         InlineKeyboardRow row = new InlineKeyboardRow();
                         row.add(button);
 
-                        // Создаем разметку клавиатуры и добавляем строку
+                        // Create a keyboard layout and add a line
                         InlineKeyboardMarkup markup = new InlineKeyboardMarkup(Collections.singletonList(row));
 
                         String messageText =  person.getName() + " " + person.getSurnem() +
-                                "\n   " + person.getMail() + "\n   " + person.getNumb();
+                                "\n" + person.getMail() + "\n" + person.getNumb();
 
-                        SendMessage sendMessage = SendMessage.builder()
+                        // Create and send a message
+                        SendMessage sendMessage = SendMessage
+                                .builder()
                                 .chatId(chatId)
                                 .text(messageText)
                                 .build();
                         sendMessage.setReplyMarkup(markup);
                         telegramClient.execute(sendMessage);
+                        System.out.println(chatId);
                     }
                 }
             }
@@ -94,6 +98,4 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
             e.printStackTrace();
         }
     }
-
-
 }
