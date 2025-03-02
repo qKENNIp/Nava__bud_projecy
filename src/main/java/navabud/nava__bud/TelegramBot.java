@@ -19,8 +19,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import java.util.*;
 
-import static Essence.GLOBALTOKENS.ADMINUSER;
-import static Essence.GLOBALTOKENS.BOT_TOKEN;
+import static Essence.GLOBALTOKENS.*;
 
 @WebServlet("/telegram-bot")
 public class TelegramBot extends HttpServlet implements LongPollingSingleThreadUpdateConsumer {
@@ -42,7 +41,6 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                 for (String key : buttons.keySet()) {
                     if (key.equals(callbackData)) {
                         // Performing an action when the button is pressed
-
                         Main.sqlUsing.SqlUpdate(buttons.get(key));
 
                         // Creating an AnswerCallbackQuery object using setters
@@ -52,7 +50,7 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
                         // Send response to callback request
                         telegramClient.execute(answerCallbackQuery);
                         buttons.remove(key);
-                        System.out.println("AnswerCallbackQuery: " + answerCallbackQuery.getText());
+                        //System.out.println("AnswerCallbackQuery: " + answerCallbackQuery.getText());
                     }
                 }
 
@@ -60,7 +58,9 @@ public class TelegramBot extends HttpServlet implements LongPollingSingleThreadU
 
             // Text message processing
             if (update.hasMessage() && update.getMessage().hasText()) {
-                if ("/start".equals(update.getMessage().getText()) && (update.getMessage().getChatId() == ADMINUSER)) {
+                if ("/start".equals(update.getMessage().getText()) &&
+                        ((update.getMessage().getChatId() == ADMINUSER)
+                        || (update.getMessage().getChatId() == ADMINSCOND))) {
                     long chatId = update.getMessage().getChatId();
 
                     ArrayList<Person> list = new ArrayList<>();

@@ -1,11 +1,13 @@
 package navabud.nava__bud;
 
 import java.io.*;
+
 import Essence.Person;
-import Main.Main;
+import Main.sqlUsing;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -22,9 +24,10 @@ public class HelloServlet extends HttpServlet {
         response.setHeader("Access-Control-Allow-Origin", "*"); // Разрешаем запросы с любого источника
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setStatus(HttpServletResponse.SC_OK);
         request.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
+
 
         // Чтение тела запроса в формате JSON
         BufferedReader reader = request.getReader();
@@ -48,16 +51,6 @@ public class HelloServlet extends HttpServlet {
         String phone = (String) jsonRequest.get("phone");
         String consent = (String) jsonRequest.get("consent");
 
-
-        // Логика обработки данных
-        // Здесь просто выводим данные в консоль, но можно сделать и больше.
-        System.out.print("Received data: ");
-        System.out.print(" Name: " + name);
-        System.out.print(" Surname: " + surname);
-        System.out.print(" Email: " + email);
-        System.out.print(" Phone: " + phone);
-        System.out.println(" Consent: " + consent);
-
         // Создаем JSON-объект для ответа
         JSONObject jsonResponse = new JSONObject();
 
@@ -70,7 +63,7 @@ public class HelloServlet extends HttpServlet {
             jsonResponse.put("message", "Некоторые данные отсутствуют.");
         }
         try {
-            Main.sqlUsing.SqlAdd(new Person(name,surname,email,phone));
+            sqlUsing.SqlAdd(new Person(name, surname, email, phone));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -81,6 +74,7 @@ public class HelloServlet extends HttpServlet {
         out.flush();
 
     }
+
     private void sendError(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.setContentType("application/json");
@@ -90,6 +84,8 @@ public class HelloServlet extends HttpServlet {
         errorJson.put("error", message);
         response.getWriter().write(errorJson.toJSONString());
     }
+
+    //CORS
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader("Access-Control-Allow-Origin", "*");//change on actual link
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");

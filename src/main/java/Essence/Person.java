@@ -57,9 +57,7 @@ public class Person {
         return this.mail;
     }
 
-    public void setNumb(String numb){
-        this.numb = numb;
-    }
+    public void setNumb(String numb){this.numb = numb;}
     public String getNumb(){
         return this.numb;
     }

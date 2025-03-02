@@ -26,7 +26,8 @@ public class sqlUsing  {
 
             int results = statement.executeUpdate(
                     "INSERT INTO `testTable` (`id`, `data_add`, `name`, `surname`, `mail`, `number`) " +
-                            "VALUES (NULL,'"+pers.getDate()+"', '"+ pers.getName() +"', '"+ pers.getSurnem() +"', '"+ pers.getMail() +"', '"+ pers.getNumb()+"')");
+                            "VALUES (NULL,'"+pers.getDate()+"', '"+ pers.getName() +
+                            "', '"+ pers.getSurnem() +"', '"+ pers.getMail() +"', '"+ pers.getNumb()+"')");
             connection.close();
         }catch (Exception e) {
             e.printStackTrace();
